@@ -1,7 +1,9 @@
 ---
 title: "Material reciclável triado por associações de catadores"
 author: "Alexandre Palhano dos Santos"
-format: html
+format: 
+  html:
+    embed-resources: true
 lang: pt-BR
 execute:
   echo: false
@@ -19,14 +21,17 @@ tar_load(dados_completos)
 tar_load(resumo_unid)
 tar_load(resumo_cat)
 tar_load(tab_final)
-fmt <- function(x) format(x, big.mark = ".", decimal.mark = ",", scientific = FALSE)
+fmt <- function(x) {
+  format(x, big.mark = ".", decimal.mark = ",", scientific = FALSE)
+}
 ```
 
 Para esta análise, os meses sem registro nas unidades foram tratados como zero (indicando ausência de coleta no período), o que afeta diretamente o cálculo da média mensal puxando-a para baixo, mas mantém o total do ano inalterado. O total geral registrado em todas as categorias foi de:
 
 ```{r}
 #| echo: false
-format(sum(targets::tar_read(resumo_cat)$total_ano), big.mark = ".", decimal.mark = ",")
+format(sum(targets::tar_read(resumo_cat)$total_ano),
+       big.mark = ".", decimal.mark = ",")
 ```
 
 ## 1. Os dados
@@ -40,12 +45,11 @@ A @tbl-conferencia abaixo mostra os totais, que batem com os valores de conferê
 ```{r}
 #| label: tbl-conferencia
 #| tbl-cap: "Tabela de conferência com os totais de cada ano."
-dados_completos %>%
-group_by(ano) %>%
-summarise(Total = sum(medicao)) %>%
-kable()
+dados_completos |>
+  group_by(ano) |>
+  summarise(Total = sum(medicao)) |>
+  kable()
 ```
-
 
 ## 2. Sazonalidade
 
@@ -54,16 +58,14 @@ A sazonalidade da coleta pode ser observada na @fig-sazonalidade. O mês que apr
 ```{r}
 #| label: fig-sazonalidade
 #| fig-cap: "Média mensal da medida relativa, com uma linha para cada ano."
-dados_completos %>%
-group_by(ano, mes) %>%
-summarise(media = mean(medicao), .groups = "drop") %>%
-ggplot(aes(x = mes, y = media, color = factor(ano), group = ano)) +
-geom_line() + geom_point() +
-theme_minimal() +
-labs(x = "Mês", y = "Média Mensal", color = "Ano")
+dados_completos |>
+  group_by(ano, mes) |>
+  summarise(media = mean(medicao), .groups = "drop") |>
+  ggplot(aes(x = mes, y = media, color = factor(ano), group = ano)) +
+  geom_line() + geom_point() +
+  theme_minimal() +
+  labs(x = "Mês", y = "Média Mensal", color = "Ano")
 ```
-
-
 
 ## 3. Variação entre 2023 e 2025
 
@@ -72,12 +74,11 @@ A @tbl-variacao apresenta as médias anuais. A comparação utiliza a média em 
 ```{r}
 #| label: tbl-variacao
 #| tbl-cap: "Média da medida relativa por ano."
-dados_completos %>%
-group_by(ano) %>%
-summarise(Media = mean(medicao)) %>%
-kable()
+dados_completos |>
+  group_by(ano) |>
+  summarise(Media = mean(medicao)) |>
+  kable()
 ```
-
 
 ## 4. Diferenças entre categorias
 
@@ -87,40 +88,38 @@ A distribuição das medidas entre as diferentes categorias (galpões) está ilu
 #| label: fig-categorias
 #| fig-cap: "Distribuição da medida relativa por categoria (Boxplot)."
 ggplot(dados_completos, aes(x = galpao, y = medicao, fill = galpao)) +
-geom_boxplot() +
-theme_minimal() +
-labs(x = "Categoria (Galpão)", y = "Medida Relativa") +
-theme(legend.position = "none")
+  geom_boxplot() +
+  theme_minimal() +
+  labs(x = "Categoria (Galpão)", y = "Medida Relativa") +
+  theme(legend.position = "none")
 ```
 
 ```{r}
 #| label: tbl-medias-cat
 #| tbl-cap: "Média de coleta por categoria."
 # Aproveitamos o alvo resumo_cat que já calculou essas médias!
-resumo_cat %>%
-select(galpao, media_mensal) %>%
-kable()
+resumo_cat |>
+  select(galpao, media_mensal) |>
+  kable()
 ```
-
 
 ## 5. As tabelas da lista 3
 
-detalhamos o desempenho individual na @tbl-resumo-unidade e a visão consolidada ao longo dos anos na @tbl-apresentacao,  ordenado pela média mensal.
+detalhamos o desempenho individual na @tbl-resumo-unidade e a visão consolidada ao longo dos anos na @tbl-apresentacao, ordenado pela média mensal.
 
 ```{r}
 #| label: tbl-resumo-unidade
 #| tbl-cap: "Resumo anual por unidade"
 #| echo: false
-targets::tar_read(resumo_unid) %>% knitr::kable()
+targets::tar_read(resumo_unid) |> knitr::kable()
 ```
 
 ```{r}
 #| label: tbl-apresentacao
 #| tbl-cap: "Total por Categoria e Ano"
 #| echo: false
-targets::tar_read(tab_final) %>% knitr::kable()
+targets::tar_read(tab_final) |> knitr::kable()
 ```
-
 
 ## 6. Diferença entre categorias
 
@@ -130,7 +129,5 @@ por fim, a diferença entre as categorias em relação aos anos.
 #| label: tbl-categoria
 #| tbl-cap: "Resumo por Categoria (Galpão)"
 #| echo: false
-targets::tar_read(resumo_cat) %>% knitr::kable()
+targets::tar_read(resumo_cat) |> knitr::kable()
 ```
-
-
