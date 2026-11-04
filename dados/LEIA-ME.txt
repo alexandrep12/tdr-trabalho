@@ -1,0 +1,29 @@
+Lista 03 --- dados sorteados para o login alexandrep12
+
+Tema: Material reciclável triado por associações de catadores
+Unidade de observação: associação
+
+Arquivos
+
+  reciclaveis_2023.csv, reciclaveis_2024.csv, reciclaveis_2025.csv
+      Uma linha por unidade e uma coluna por mês do ano. A coluna
+      codigo identifica a unidade, e as colunas jan a dez trazem o
+      valor medido: material triado no mês, em toneladas.
+      Mês sem registro aparece como "-".
+
+  cadastro.csv
+      Uma linha por unidade, com as colunas:
+        codigo        identificador da unidade, o mesmo das medições
+        nome          nome da unidade
+        galpao        categoria: Próprio, Cedido ou Alugado
+        associados    porte: catadores associados
+
+Conferência
+
+  unidades no cadastro:   12
+  unidades com medições:  11
+
+  ano    meses sem registro    soma dos valores registrados
+  2023                    2                          4963,1
+  2024                    4                          4914,6
+  2025                    4                          5092,9
