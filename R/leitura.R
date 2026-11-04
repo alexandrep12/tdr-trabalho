@@ -14,17 +14,15 @@ ler_cadastro <- function(caminho) {
 ler_todos_anos <- function(arquivos) {
   arquivos |>
     set_names() |>
-    purrr::map_dfr(
-      ~ read_delim(
-        .x,
+    purrr::map_dfr(function(caminho) {
+      read_delim(
+        caminho,
         delim = ";",
         locale = locale(decimal_mark = ",", grouping_mark = "."),
         col_types = cols(codigo = col_character(), .default = col_double()),
         na = c("", "NA", "-"),
         lazy = FALSE
-      ),
-      .id = "origem"
-    ) |>
-    mutate(ano = parse_number(basename(.data$origem))) |>
-    select(-.data$origem)
+      ) |>
+        mutate(ano = parse_number(basename(caminho)))
+    })
 }
