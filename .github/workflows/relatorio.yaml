@@ -2,43 +2,44 @@ on:
   push:
     branches: [trabalho]
   pull_request:
-    branches: [trabalho, main]
+    branches: [trabalho]
+  workflow_dispatch:
 
-name: Render Relatorio Quarto
+name: relatorio.yaml
+
+permissions: read-all
 
 jobs:
-  build-render:
-    runs-on: ubuntu-latest
-    
-    env:
-      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
-      
+  relatorio:
+    runs-on: ubuntu-24.04
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - name: Setup Pandoc
-        uses: r-lib/actions/setup-pandoc@v2
-
-      - name: Setup Quarto
-        uses: quarto-dev/quarto-actions/setup@v2
-
-      - name: Setup R
-        uses: r-lib/actions/setup-r@v2
-        with:
-          use-renv: true
-
-      - name: Install system dependencies
-        uses: r-lib/actions/setup-r-dependencies@v2
-        with:
-          install-system-deps: "true"
-
-      - name: Run Targets Pipeline
+      - name: Instala as bibliotecas do sistema
         run: |
-          Rscript -e 'targets::tar_make()'
+          sudo apt-get update
+          sudo apt install -y cmake
+          sudo apt install -y libglpk-dev
+          sudo apt install -y libicu-dev
+          sudo apt install -y libuv1-dev
+          sudo apt install -y libx11-dev
+          sudo apt install -y libxml2-dev
+          sudo apt install -y make
+          sudo apt install -y pandoc
 
-      - name: Upload HTML Report Artifact
-        uses: actions/upload-artifact@v4
+      - uses: quarto-dev/quarto-actions/setup@v2
+
+      - uses: r-lib/actions/setup-r@v2
         with:
-          name: relatorio-html
+          r-version: renv
+
+      - uses: r-lib/actions/setup-renv@v2
+
+      - name: Executa o pipeline
+        run: targets::tar_make()
+        shell: Rscript {0}
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: relatorio
           path: relatorio.html
