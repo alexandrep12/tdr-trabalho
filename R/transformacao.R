@@ -11,7 +11,7 @@ empilhar_meses <- function(dados) {
       names_to = "mes",
       values_to = "medicao"
     ) |>
-    mutate(medicao <- replace_na(medicao, 0))
+    mutate(medicao = replace_na(.data$medicao, 0))
 }
 
 # 2. Cruza o cadastro limpo com os dados do ano empilhados
